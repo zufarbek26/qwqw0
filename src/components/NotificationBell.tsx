@@ -45,7 +45,7 @@ export const NotificationBell: React.FC = () => {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-80 max-h-96 overflow-y-auto" align="end">
+      <DropdownMenuContent className="w-80 max-h-[500px] overflow-y-auto" align="end">
         <div className="flex items-center justify-between p-2 border-b">
           <span className="font-semibold">Уведомления</span>
           {unreadCount > 0 && (
@@ -56,9 +56,23 @@ export const NotificationBell: React.FC = () => {
           )}
         </div>
         
+        {/* AI Helper - always at top */}
+        <div className="p-2 border-b bg-gradient-to-r from-purple-500/10 to-pink-500/10">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full justify-start gap-2 border-purple-500/30 hover:bg-purple-500/20 bg-purple-500/5"
+            onClick={() => navigate('/my-results')}
+          >
+            <Sparkles className="h-4 w-4 text-purple-500" />
+            <span className="text-sm font-medium">AI-помощник по ошибкам 🤖</span>
+          </Button>
+        </div>
+        
+        {/* Notifications list */}
         {notifications.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground">
-            <Bell className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <div className="p-6 text-center text-muted-foreground">
+            <Bell className="h-6 w-6 mx-auto mb-2 opacity-50" />
             <p className="text-sm">Нет уведомлений</p>
           </div>
         ) : (
@@ -97,20 +111,6 @@ export const NotificationBell: React.FC = () => {
             </DropdownMenuItem>
           ))
         )}
-        
-        {/* Quick Actions - AI helper at top */}
-        <DropdownMenuSeparator />
-        <div className="p-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="w-full justify-start gap-2 border-purple-500/30 hover:bg-purple-500/10 bg-purple-500/5"
-            onClick={() => navigate('/my-results')}
-          >
-            <Sparkles className="h-4 w-4 text-purple-500" />
-            <span className="text-sm font-medium">AI-помощник по ошибкам</span>
-          </Button>
-        </div>
         
         {notifications.length > 0 && (
           <>
