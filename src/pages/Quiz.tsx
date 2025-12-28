@@ -18,8 +18,7 @@ import {
 import { cn } from '@/lib/utils';
 
 interface Question {
-  id: string;
-  text: string;
+  question: string;
   options: string[];
   correctAnswer: number;
   explanation?: string;
@@ -216,7 +215,8 @@ const Quiz: React.FC = () => {
         const isCorrect = userAnswer === q.correctAnswer;
         if (isCorrect) score++;
         return {
-          questionId: q.id,
+          questionIndex: index,
+          question: q.question,
           userAnswer,
           correctAnswer: q.correctAnswer,
           isCorrect,
@@ -338,7 +338,7 @@ const Quiz: React.FC = () => {
           {/* Question Card */}
           <Card className="glass-card mb-6">
             <CardHeader>
-              <CardTitle className="text-lg">{currentQ.text}</CardTitle>
+              <CardTitle className="text-lg">{currentQ.question}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {currentQ.options.map((option, index) => (
