@@ -25,7 +25,9 @@ import {
   Edit,
   Key,
   Mail,
-  Save
+  Save,
+  Award,
+  Bell
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -393,6 +395,10 @@ const Admin: React.FC = () => {
               <TabsTrigger value="daily" className="gap-2">
                 <Zap className="h-4 w-4" />
                 Daily Challenge
+              </TabsTrigger>
+              <TabsTrigger value="achievements" className="gap-2">
+                <Award className="h-4 w-4" />
+                Достижения
               </TabsTrigger>
             </TabsList>
 
@@ -784,6 +790,96 @@ const Admin: React.FC = () => {
                   <Button onClick={handleCreateChallenge} className="btn-primary">
                     <Zap className="h-4 w-4 mr-2" />
                     Создать задание
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Achievements Tab */}
+            <TabsContent value="achievements" className="space-y-6">
+              <Card className="glass-card">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Award className="h-5 w-5 text-yellow-500" />
+                    Управление достижениями
+                  </CardTitle>
+                  <CardDescription>
+                    Просмотр всех достижений в системе. Редактирование через базу данных.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-muted-foreground text-center py-8">
+                    <Award className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>Достижения настроены автоматически</p>
+                    <p className="text-sm mt-2">
+                      Пользователи получают их за: тесты, очки, streak и ежедневные задания
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      className="mt-4"
+                      onClick={() => navigate('/achievements')}
+                    >
+                      Просмотреть все достижения
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass-card">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Bell className="h-5 w-5 text-primary" />
+                    Отправить уведомление
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Заголовок</Label>
+                    <Input placeholder="Новый тест доступен!" id="notif-title" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Сообщение</Label>
+                    <Textarea placeholder="Проверьте новый тест по JavaScript..." id="notif-message" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Ссылка (опционально)</Label>
+                    <Input placeholder="/subjects" id="notif-link" />
+                  </div>
+                  <Button 
+                    className="btn-primary"
+                    onClick={async () => {
+                      const title = (document.getElementById('notif-title') as HTMLInputElement)?.value;
+                      const message = (document.getElementById('notif-message') as HTMLTextAreaElement)?.value;
+                      const link = (document.getElementById('notif-link') as HTMLInputElement)?.value;
+                      
+                      if (!title || !message) {
+                        toast({ title: 'Ошибка', description: 'Заполните заголовок и сообщение', variant: 'destructive' });
+                        return;
+                      }
+                      
+                      // Send to all users
+                      const { data: allUsers } = await supabase.from('profiles').select('id');
+                      if (allUsers) {
+                        const notifications = allUsers.map(u => ({
+                          user_id: u.id,
+                          title,
+                          message,
+                          type: 'info',
+                          link: link || null,
+                        }));
+                        
+                        await supabase.from('notifications').insert(notifications);
+                        toast({ title: 'Успешно', description: `Уведомление отправлено ${allUsers.length} пользователям` });
+                        
+                        // Clear form
+                        (document.getElementById('notif-title') as HTMLInputElement).value = '';
+                        (document.getElementById('notif-message') as HTMLTextAreaElement).value = '';
+                        (document.getElementById('notif-link') as HTMLInputElement).value = '';
+                      }
+                    }}
+                  >
+                    <Bell className="h-4 w-4 mr-2" />
+                    Отправить всем
                   </Button>
                 </CardContent>
               </Card>
