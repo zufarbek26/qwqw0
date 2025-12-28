@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Bell, Check, CheckCheck, Trophy, BookOpen, Zap } from 'lucide-react';
+import { Bell, CheckCheck, Trophy, BookOpen, Zap, Sparkles, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
@@ -18,6 +18,7 @@ const iconMap: Record<string, React.ReactNode> = {
   'achievement': <Trophy className="h-4 w-4 text-yellow-500" />,
   'test': <BookOpen className="h-4 w-4 text-blue-500" />,
   'daily': <Zap className="h-4 w-4 text-orange-500" />,
+  'ai': <Sparkles className="h-4 w-4 text-purple-500" />,
   'info': <Bell className="h-4 w-4 text-muted-foreground" />,
 };
 
@@ -96,6 +97,29 @@ export const NotificationBell: React.FC = () => {
             </DropdownMenuItem>
           ))
         )}
+        
+        {/* Quick Actions */}
+        <DropdownMenuSeparator />
+        <div className="p-2 space-y-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full justify-start gap-2 border-purple-500/30 hover:bg-purple-500/10"
+            onClick={() => navigate('/my-results')}
+          >
+            <Sparkles className="h-4 w-4 text-purple-500" />
+            <span className="text-sm">AI-помощник по ошибкам</span>
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full justify-start gap-2 border-primary/30 hover:bg-primary/10"
+            onClick={() => navigate('/install')}
+          >
+            <Download className="h-4 w-4 text-primary" />
+            <span className="text-sm">Установить приложение</span>
+          </Button>
+        </div>
         
         {notifications.length > 0 && (
           <>
