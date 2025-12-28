@@ -61,12 +61,20 @@ export const Header: React.FC = () => {
             Рейтинг
           </Link>
           {user && (
-            <Link 
-              to="/my-results" 
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Мои результаты
-            </Link>
+            <>
+              <Link 
+                to="/my-results" 
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Мои результаты
+              </Link>
+              <Link 
+                to="/daily-challenge" 
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Daily Challenge
+              </Link>
+            </>
           )}
         </nav>
 

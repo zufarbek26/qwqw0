@@ -7,6 +7,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { SUBJECTS } from '@/lib/constants';
+import { downloadCertificate } from '@/lib/certificate';
 import { 
   Trophy, 
   Clock, 
@@ -14,10 +16,12 @@ import {
   XCircle, 
   Home,
   RotateCcw,
-  Share2,
-  Loader2
+  Download,
+  Loader2,
+  Award
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 interface Answer {
   questionId: string;
@@ -51,10 +55,12 @@ interface TestResult {
 const Result: React.FC = () => {
   const { resultId } = useParams<{ resultId: string }>();
   const navigate = useNavigate();
-  const { user, refreshProfile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
+  const { toast } = useToast();
   const [result, setResult] = useState<TestResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAnswers, setShowAnswers] = useState(false);
+  const [certificateLoading, setCertificateLoading] = useState(false);
 
   useEffect(() => {
     const fetchResult = async () => {
@@ -101,6 +107,66 @@ const Result: React.FC = () => {
     return { label: 'Нужно подтянуть', emoji: '💪', color: 'text-red-500' };
   };
 
+  const handleDownloadCertificate = async () => {
+    if (!result || !user || !profile) return;
+
+    setCertificateLoading(true);
+
+    try {
+      // Check if certificate already exists
+      let { data: existingCert } = await supabase
+        .from('certificates')
+        .select('id')
+        .eq('result_id', result.id)
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      let certificateId = existingCert?.id;
+
+      // Create certificate record if not exists
+      if (!certificateId) {
+        const { data: newCert, error: certError } = await supabase
+          .from('certificates')
+          .insert({
+            result_id: result.id,
+            test_id: result.test.id,
+            user_id: user.id,
+          })
+          .select('id')
+          .single();
+
+        if (certError) throw certError;
+        certificateId = newCert.id;
+      }
+
+      const subject = SUBJECTS.find(s => s.id === result.test.subject);
+
+      // Generate and download PDF
+      downloadCertificate({
+        userName: profile.name || 'Участник',
+        testTitle: result.test.title,
+        subjectName: subject?.name || result.test.subject,
+        percentage: result.percentage,
+        completedAt: result.completed_at,
+        certificateId: certificateId,
+      });
+
+      toast({
+        title: "Сертификат скачан!",
+        description: "PDF файл сохранён на ваше устройство",
+      });
+    } catch (error) {
+      console.error('Error generating certificate:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось создать сертификат",
+        variant: "destructive",
+      });
+    } finally {
+      setCertificateLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -121,6 +187,7 @@ const Result: React.FC = () => {
   }
 
   const grade = getGrade(result.percentage);
+  const canGetCertificate = result.percentage >= 70;
 
   return (
     <>
@@ -171,6 +238,35 @@ const Result: React.FC = () => {
                   <div className="text-xs text-muted-foreground">Очков</div>
                 </div>
               </div>
+
+              {/* Certificate Banner */}
+              {canGetCertificate && (
+                <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/30">
+                  <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div className="flex items-center gap-3">
+                      <Award className="h-8 w-8 text-primary" />
+                      <div>
+                        <h3 className="font-semibold">Поздравляем! 🎉</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Вы успешно прошли тест и можете получить сертификат
+                        </p>
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={handleDownloadCertificate}
+                      disabled={certificateLoading}
+                      className="btn-primary"
+                    >
+                      {certificateLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : (
+                        <Download className="h-4 w-4 mr-2" />
+                      )}
+                      <span>Скачать сертификат</span>
+                    </Button>
+                  </div>
+                </div>
+              )}
 
               {/* Actions */}
               <div className="flex flex-col sm:flex-row gap-3">
