@@ -26,8 +26,10 @@ interface AuthContextType {
   loading: boolean;
   signUp: (email: string, password: string, name: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signInWithGoogle: () => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  updateProfile: (updates: { name?: string; email?: string }) => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -77,14 +79,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          // Defer Supabase calls with setTimeout
           setTimeout(() => {
             fetchProfile(session.user.id);
           }, 0);
@@ -95,7 +95,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -170,6 +169,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (error) throw error;
+
+      return { error: null };
+    } catch (error) {
+      const err = error as Error;
+      toast({
+        title: "Ошибка входа через Google",
+        description: err.message,
+        variant: "destructive",
+      });
+      return { error: err };
+    }
+  };
+
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
@@ -184,6 +206,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateProfile = async (updates: { name?: string; email?: string }) => {
+    try {
+      if (!user) throw new Error('Пользователь не авторизован');
+
+      // Update email in auth if changed
+      if (updates.email && updates.email !== user.email) {
+        const { error: authError } = await supabase.auth.updateUser({
+          email: updates.email,
+        });
+        if (authError) throw authError;
+      }
+
+      // Update profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          name: updates.name,
+          email: updates.email,
+        })
+        .eq('id', user.id);
+
+      if (profileError) throw profileError;
+
+      await refreshProfile();
+
+      toast({
+        title: "Профиль обновлён",
+        description: "Изменения сохранены успешно!",
+      });
+
+      return { error: null };
+    } catch (error) {
+      const err = error as Error;
+      toast({
+        title: "Ошибка обновления",
+        description: err.message,
+        variant: "destructive",
+      });
+      return { error: err };
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -193,8 +257,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       loading,
       signUp,
       signIn,
+      signInWithGoogle,
       signOut,
       refreshProfile,
+      updateProfile,
     }}>
       {children}
     </AuthContext.Provider>
