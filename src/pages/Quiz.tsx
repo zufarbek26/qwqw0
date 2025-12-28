@@ -293,7 +293,7 @@ const Quiz: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>{test.title} — Тест | EduPlatform</title>
+        <title>{test.title} — Тест | TestLix</title>
       </Helmet>
       <div className="min-h-screen bg-background p-4">
         {/* Background effects */}

@@ -255,7 +255,7 @@ const Result: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Результат теста — EduPlatform</title>
+        <title>Результат теста — TestLix</title>
       </Helmet>
       <Layout>
         <div className="container py-12 px-4 max-w-3xl mx-auto">

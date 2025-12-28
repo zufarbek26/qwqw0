@@ -374,7 +374,7 @@ const Admin: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Админ-панель — EduPlatform</title>
+        <title>Админ-панель — TestLix</title>
       </Helmet>
       <Layout>
         <div className="container py-8 px-4">

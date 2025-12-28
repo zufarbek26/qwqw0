@@ -75,7 +75,7 @@ const Subject: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>{subject.name} — Тесты | EduPlatform</title>
+        <title>{subject.name} — Тесты | TestLix</title>
         <meta name="description" content={subject.description} />
       </Helmet>
       <Layout>

@@ -9,7 +9,7 @@ const Index: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>EduPlatform — Образовательная платформа с тестами</title>
+        <title>TestLix — Образовательная платформа с тестами</title>
         <meta 
           name="description" 
           content="Интерактивные тесты по программированию, математике и естественным наукам. Учись, соревнуйся и получай сертификаты." 

@@ -6,8 +6,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { SUBJECTS, LEVEL_LABELS } from '@/lib/constants';
-import { Trophy, Medal, Crown, Loader2 } from 'lucide-react';
+import { LEVEL_LABELS } from '@/lib/constants';
+import { Trophy, Medal, Crown, Loader2, Users, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface LeaderboardEntry {
@@ -24,19 +24,28 @@ const Leaderboard: React.FC = () => {
   const [leaders, setLeaders] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
+  const [onlineCount, setOnlineCount] = useState(0);
+  const [totalUsers, setTotalUsers] = useState(0);
 
+  // Fetch leaderboard and total users count
   useEffect(() => {
-    const fetchLeaders = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('id, name, avatar_url, total_points, level, tests_completed')
-          .order('total_points', { ascending: false })
-          .limit(50);
+        const [leadersRes, countRes] = await Promise.all([
+          supabase
+            .from('profiles')
+            .select('id, name, avatar_url, total_points, level, tests_completed')
+            .order('total_points', { ascending: false })
+            .limit(50),
+          supabase
+            .from('profiles')
+            .select('id', { count: 'exact', head: true })
+        ]);
 
-        if (error) throw error;
-        setLeaders(data as LeaderboardEntry[]);
+        if (leadersRes.error) throw leadersRes.error;
+        setLeaders(leadersRes.data as LeaderboardEntry[]);
+        setTotalUsers(countRes.count || 0);
       } catch (error) {
         console.error('Error fetching leaderboard:', error);
       } finally {
@@ -44,8 +53,38 @@ const Leaderboard: React.FC = () => {
       }
     };
 
-    fetchLeaders();
+    fetchData();
   }, []);
+
+  // Track online users with Realtime Presence
+  useEffect(() => {
+    const channel = supabase.channel('online-users', {
+      config: {
+        presence: {
+          key: user?.id || 'anonymous-' + Math.random().toString(36).substr(2, 9),
+        },
+      },
+    });
+
+    channel
+      .on('presence', { event: 'sync' }, () => {
+        const state = channel.presenceState();
+        const count = Object.keys(state).length;
+        setOnlineCount(count);
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await channel.track({
+            online_at: new Date().toISOString(),
+            user_id: user?.id || null,
+          });
+        }
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id]);
 
   const getInitials = (name: string) => {
     return name
@@ -85,7 +124,7 @@ const Leaderboard: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Рейтинг — EduPlatform</title>
+        <title>Рейтинг — TestLix</title>
         <meta name="description" content="Топ учеников по очкам и достижениям" />
       </Helmet>
       <Layout>
@@ -97,6 +136,21 @@ const Leaderboard: React.FC = () => {
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Соревнуйся с другими и поднимайся в топ
             </p>
+            
+            {/* Online Stats */}
+            <div className="flex justify-center gap-8 mt-6">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/30">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <Users className="h-4 w-4 text-green-500" />
+                <span className="font-semibold text-green-500">{onlineCount}</span>
+                <span className="text-muted-foreground text-sm">онлайн</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30">
+                <Globe className="h-4 w-4 text-primary" />
+                <span className="font-semibold text-primary">{totalUsers.toLocaleString()}</span>
+                <span className="text-muted-foreground text-sm">всего</span>
+              </div>
+            </div>
           </div>
 
           <Card className="glass-card">

@@ -128,7 +128,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       toast({
         title: "Регистрация успешна!",
-        description: "Добро пожаловать в EduPlatform!",
+        description: "Добро пожаловать в TestLix!",
       });
 
       return { error: null };

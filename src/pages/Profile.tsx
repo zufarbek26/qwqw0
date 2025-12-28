@@ -103,7 +103,7 @@ const Profile: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Профиль — EduPlatform</title>
+        <title>Профиль — TestLix</title>
       </Helmet>
       <Layout>
         <div className="container py-12 px-4">

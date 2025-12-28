@@ -171,7 +171,7 @@ const DailyChallengePage: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Ежедневное задание — EduPlatform</title>
+        <title>Ежедневное задание — TestLix</title>
       </Helmet>
       <Layout>
         <div className="container py-12 px-4">

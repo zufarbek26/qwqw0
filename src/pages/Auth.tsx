@@ -99,7 +99,7 @@ const Auth: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>{mode === 'signup' ? 'Регистрация' : 'Вход'} — EduPlatform</title>
+        <title>{mode === 'signup' ? 'Регистрация' : 'Вход'} — TestLix</title>
       </Helmet>
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         {/* Background effects */}

@@ -102,7 +102,7 @@ const MyResults: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Мои результаты — EduPlatform</title>
+        <title>Мои результаты — TestLix</title>
       </Helmet>
       <Layout>
         <div className="container py-12 px-4">

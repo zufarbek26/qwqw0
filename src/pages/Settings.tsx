@@ -68,7 +68,7 @@ const Settings: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Настройки — EduPlatform</title>
+        <title>Настройки — TestLix</title>
       </Helmet>
       <Layout>
         <div className="container py-12 px-4">
