@@ -98,26 +98,17 @@ export const NotificationBell: React.FC = () => {
           ))
         )}
         
-        {/* Quick Actions */}
+        {/* Quick Actions - AI helper at top */}
         <DropdownMenuSeparator />
-        <div className="p-2 space-y-2">
+        <div className="p-2">
           <Button 
             variant="outline" 
             size="sm" 
-            className="w-full justify-start gap-2 border-purple-500/30 hover:bg-purple-500/10"
+            className="w-full justify-start gap-2 border-purple-500/30 hover:bg-purple-500/10 bg-purple-500/5"
             onClick={() => navigate('/my-results')}
           >
             <Sparkles className="h-4 w-4 text-purple-500" />
-            <span className="text-sm">AI-помощник по ошибкам</span>
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="w-full justify-start gap-2 border-primary/30 hover:bg-primary/10"
-            onClick={() => navigate('/install')}
-          >
-            <Download className="h-4 w-4 text-primary" />
-            <span className="text-sm">Установить приложение</span>
+            <span className="text-sm font-medium">AI-помощник по ошибкам</span>
           </Button>
         </div>
         
@@ -132,6 +123,20 @@ export const NotificationBell: React.FC = () => {
             </DropdownMenuItem>
           </>
         )}
+        
+        {/* Install app at bottom */}
+        <DropdownMenuSeparator />
+        <div className="p-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+            onClick={() => navigate('/install')}
+          >
+            <Download className="h-4 w-4" />
+            <span className="text-sm">Установить приложение</span>
+          </Button>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );
