@@ -50,7 +50,7 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(16);
   doc.setFont('helvetica', 'normal');
-  doc.text('EDUPLATFORM', pageWidth / 2, 35, { align: 'center' });
+  doc.text('TESTLIX', pageWidth / 2, 35, { align: 'center' });
 
   // Certificate text
   doc.setFontSize(42);
@@ -128,7 +128,7 @@ export const generateCertificatePDF = (data: CertificateData): jsPDF => {
 
   // Footer
   doc.setFontSize(10);
-  doc.text('eduplatform.app', pageWidth / 2, pageHeight - 20, { align: 'center' });
+  doc.text('testlix.app', pageWidth / 2, pageHeight - 20, { align: 'center' });
 
   return doc;
 };

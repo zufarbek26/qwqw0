@@ -44,7 +44,7 @@ export const Header: React.FC = () => {
             <GraduationCap className="h-8 w-8 text-primary transition-transform group-hover:scale-110" />
             <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
-          <span className="text-xl font-bold gradient-text">EduPlatform</span>
+          <span className="text-xl font-bold gradient-text">TestLix</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
