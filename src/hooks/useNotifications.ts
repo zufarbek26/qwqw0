@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { playNotificationSound } from '@/lib/sounds';
 
 interface Notification {
   id: string;
@@ -43,6 +44,8 @@ export const useNotifications = () => {
         (payload) => {
           setNotifications(prev => [payload.new as Notification, ...prev]);
           setUnreadCount(prev => prev + 1);
+          // Play notification sound for new notifications
+          playNotificationSound();
         }
       )
       .subscribe();

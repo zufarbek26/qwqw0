@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { playAchievementSound } from '@/lib/sounds';
 
 interface Achievement {
   id: string;
@@ -68,6 +69,9 @@ export const checkAndAwardAchievements = async (
 
       if (!insertError) {
         newlyEarned.push(achievement);
+        
+        // Play achievement sound
+        playAchievementSound();
 
         // Create notification for the achievement
         await supabase.from('notifications').insert({
