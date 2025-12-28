@@ -16,6 +16,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { checkAndAwardAchievements } from '@/lib/achievements';
 
 interface Question {
   question: string;
@@ -242,6 +243,29 @@ const Quiz: React.FC = () => {
         .single();
 
       if (error) throw error;
+
+      // Update profile stats and check achievements
+      const { data: updatedProfile } = await supabase
+        .from('profiles')
+        .select('total_points, tests_completed, streak_days')
+        .eq('id', user.id)
+        .single();
+
+      if (updatedProfile) {
+        const isPerfect = percentage === 100;
+        const newAchievements = await checkAndAwardAchievements(
+          user.id,
+          updatedProfile,
+          { perfectScore: isPerfect }
+        );
+        
+        if (newAchievements.length > 0) {
+          toast({
+            title: `🏆 Новые достижения: ${newAchievements.length}!`,
+            description: newAchievements.map(a => a.name).join(', '),
+          });
+        }
+      }
 
       // Clear saved state
       localStorage.removeItem(`quiz-${testId}`);

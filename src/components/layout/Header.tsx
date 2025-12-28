@@ -23,6 +23,7 @@ import {
   Award,
   Download
 } from 'lucide-react';
+import { NotificationBell } from '@/components/NotificationBell';
 
 export const Header: React.FC = () => {
   const { user, profile, userRole, signOut } = useAuth();
@@ -86,7 +87,7 @@ export const Header: React.FC = () => {
           )}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="icon"
@@ -99,6 +100,8 @@ export const Header: React.FC = () => {
               <Moon className="h-5 w-5" />
             )}
           </Button>
+
+          {user && <NotificationBell />}
 
           {user && profile ? (
             <DropdownMenu>
