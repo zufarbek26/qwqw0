@@ -18,7 +18,8 @@ import {
   RotateCcw,
   Download,
   Loader2,
-  Award
+  Award,
+  Sparkles
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -61,6 +62,8 @@ const Result: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showAnswers, setShowAnswers] = useState(false);
   const [certificateLoading, setCertificateLoading] = useState(false);
+  const [aiExplanation, setAiExplanation] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     const fetchResult = async () => {
@@ -113,7 +116,6 @@ const Result: React.FC = () => {
     setCertificateLoading(true);
 
     try {
-      // Check if certificate already exists
       let { data: existingCert } = await supabase
         .from('certificates')
         .select('id')
@@ -123,7 +125,6 @@ const Result: React.FC = () => {
 
       let certificateId = existingCert?.id;
 
-      // Create certificate record if not exists
       if (!certificateId) {
         const { data: newCert, error: certError } = await supabase
           .from('certificates')
@@ -141,7 +142,6 @@ const Result: React.FC = () => {
 
       const subject = SUBJECTS.find(s => s.id === result.test.subject);
 
-      // Generate and download PDF
       downloadCertificate({
         userName: profile.name || 'Участник',
         testTitle: result.test.title,
@@ -167,6 +167,68 @@ const Result: React.FC = () => {
     }
   };
 
+  const handleAIExplain = async () => {
+    if (!result) return;
+
+    const wrongAnswers = result.test.questions
+      .map((question, index) => {
+        const answer = result.answers[index];
+        if (answer?.isCorrect) return null;
+
+        return {
+          question: question.text,
+          userAnswer: question.options[answer?.userAnswer] || 'Не отвечено',
+          correctAnswer: question.options[question.correctAnswer],
+          explanation: question.explanation,
+        };
+      })
+      .filter(Boolean);
+
+    if (wrongAnswers.length === 0) {
+      toast({
+        title: "Отлично!",
+        description: "У вас нет ошибок для анализа",
+      });
+      return;
+    }
+
+    setAiLoading(true);
+    setAiExplanation(null);
+
+    try {
+      const subject = SUBJECTS.find(s => s.id === result.test.subject);
+
+      const { data, error } = await supabase.functions.invoke('explain-errors', {
+        body: {
+          wrongAnswers,
+          subject: subject?.name || result.test.subject,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
+      setAiExplanation(data.explanation);
+      
+      toast({
+        title: "AI-анализ готов!",
+        description: "Прочитайте объяснения ваших ошибок",
+      });
+    } catch (error) {
+      console.error('Error getting AI explanation:', error);
+      toast({
+        title: "Ошибка",
+        description: error instanceof Error ? error.message : "Не удалось получить объяснение",
+        variant: "destructive",
+      });
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -188,6 +250,7 @@ const Result: React.FC = () => {
 
   const grade = getGrade(result.percentage);
   const canGetCertificate = result.percentage >= 70;
+  const hasErrors = result.score < result.total_questions;
 
   return (
     <>
@@ -266,6 +329,53 @@ const Result: React.FC = () => {
                     </Button>
                   </div>
                 </div>
+              )}
+
+              {/* AI Helper Banner */}
+              {hasErrors && (
+                <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30">
+                  <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div className="flex items-center gap-3">
+                      <Sparkles className="h-8 w-8 text-purple-500" />
+                      <div>
+                        <h3 className="font-semibold">AI-помощник 🤖</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Получите подробное объяснение ваших ошибок от AI
+                        </p>
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={handleAIExplain}
+                      disabled={aiLoading}
+                      variant="outline"
+                      className="border-purple-500/50 hover:bg-purple-500/10"
+                    >
+                      {aiLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : (
+                        <Sparkles className="h-4 w-4 mr-2" />
+                      )}
+                      {aiLoading ? 'Анализирую...' : 'Объяснить ошибки'}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* AI Explanation */}
+              {aiExplanation && (
+                <Card className="mb-6 border-purple-500/30 bg-purple-500/5">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Sparkles className="h-5 w-5 text-purple-500" />
+                      Объяснение от AI-помощника
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
+                      {aiExplanation}
+                    </div>
+                  </CardContent>
+                </Card>
               )}
 
               {/* Actions */}
