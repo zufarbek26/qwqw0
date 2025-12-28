@@ -7,8 +7,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Save, User, Mail } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Loader2, Save, User, Mail, Bell, BellOff } from 'lucide-react';
 import { z } from 'zod';
+import { useToast } from '@/hooks/use-toast';
+import { 
+  isPushSupported, 
+  getNotificationPermission, 
+  enableDailyReminders, 
+  disableDailyReminders, 
+  areDailyRemindersEnabled 
+} from '@/lib/pushNotifications';
 
 const profileSchema = z.object({
   name: z.string().min(2, 'Имя должно быть не менее 2 символов').max(50, 'Имя слишком длинное'),
@@ -18,10 +27,13 @@ const profileSchema = z.object({
 const Settings: React.FC = () => {
   const navigate = useNavigate();
   const { user, profile, loading: authLoading, updateProfile } = useAuth();
+  const { toast } = useToast();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushSupported, setPushSupported] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -35,6 +47,11 @@ const Settings: React.FC = () => {
       setEmail(profile.email || '');
     }
   }, [profile]);
+
+  useEffect(() => {
+    setPushSupported(isPushSupported());
+    setPushEnabled(areDailyRemindersEnabled() && getNotificationPermission() === 'granted');
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +72,32 @@ const Settings: React.FC = () => {
     setLoading(true);
     await updateProfile({ name, email });
     setLoading(false);
+  };
+
+  const handlePushToggle = async (checked: boolean) => {
+    if (checked) {
+      const success = await enableDailyReminders();
+      if (success) {
+        setPushEnabled(true);
+        toast({
+          title: "Уведомления включены",
+          description: "Вы будете получать напоминания о ежедневных заданиях",
+        });
+      } else {
+        toast({
+          title: "Не удалось включить уведомления",
+          description: "Разрешите уведомления в настройках браузера",
+          variant: "destructive",
+        });
+      }
+    } else {
+      disableDailyReminders();
+      setPushEnabled(false);
+      toast({
+        title: "Уведомления отключены",
+        description: "Вы больше не будете получать напоминания",
+      });
+    }
   };
 
   if (authLoading) {
@@ -129,6 +172,52 @@ const Settings: React.FC = () => {
                     Сохранить изменения
                   </Button>
                 </form>
+              </CardContent>
+            </Card>
+
+            {/* Push Notifications Card */}
+            <Card className="glass-card mt-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  {pushEnabled ? <Bell className="h-5 w-5" /> : <BellOff className="h-5 w-5" />}
+                  Уведомления
+                </CardTitle>
+                <CardDescription>
+                  Настройте push-уведомления для напоминаний
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {pushSupported ? (
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="push-notifications">Ежедневные напоминания</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Получайте напоминания о ежедневных заданиях в 9:00
+                      </p>
+                    </div>
+                    <Switch
+                      id="push-notifications"
+                      checked={pushEnabled}
+                      onCheckedChange={handlePushToggle}
+                    />
+                  </div>
+                ) : (
+                  <div className="p-4 rounded-lg bg-muted/50 text-center">
+                    <BellOff className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm text-muted-foreground">
+                      Push-уведомления не поддерживаются в этом браузере.
+                      Попробуйте установить приложение.
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="mt-3"
+                      onClick={() => navigate('/install')}
+                    >
+                      Установить приложение
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
