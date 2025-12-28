@@ -19,6 +19,8 @@ import MyResults from "./pages/MyResults";
 import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
 import DailyChallenge from "./pages/DailyChallenge";
+import Install from "./pages/Install";
+import Achievements from "./pages/Achievements";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +47,8 @@ const App = () => (
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/daily-challenge" element={<DailyChallenge />} />
+                <Route path="/install" element={<Install />} />
+                <Route path="/achievements" element={<Achievements />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

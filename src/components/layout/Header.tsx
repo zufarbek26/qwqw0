@@ -19,7 +19,9 @@ import {
   Settings, 
   LogOut, 
   Trophy,
-  LayoutDashboard 
+  LayoutDashboard,
+  Award,
+  Download
 } from 'lucide-react';
 
 export const Header: React.FC = () => {
@@ -67,6 +69,12 @@ export const Header: React.FC = () => {
                 className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 Мои результаты
+              </Link>
+              <Link 
+                to="/achievements" 
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Достижения
               </Link>
               <Link 
                 to="/daily-challenge" 
@@ -125,6 +133,14 @@ export const Header: React.FC = () => {
                 <DropdownMenuItem onClick={() => navigate('/my-results')}>
                   <Trophy className="mr-2 h-4 w-4" />
                   Мои результаты
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/achievements')}>
+                  <Award className="mr-2 h-4 w-4" />
+                  Достижения
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/install')}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Установить приложение
                 </DropdownMenuItem>
                 {userRole?.role === 'admin' && (
                   <>
