@@ -8,7 +8,7 @@ const Subjects: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Все предметы — EduPlatform</title>
+        <title>Все предметы — TestLix</title>
         <meta 
           name="description" 
           content="Выбери предмет для тестирования: программирование, математика, физика, химия, биология" 
