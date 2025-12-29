@@ -71,6 +71,8 @@ export default {
           physics: "hsl(var(--physics))",
           chemistry: "hsl(var(--chemistry))",
           biology: "hsl(var(--biology))",
+          english: "hsl(var(--english))",
+          russian: "hsl(var(--russian))",
         },
       },
       borderRadius: {

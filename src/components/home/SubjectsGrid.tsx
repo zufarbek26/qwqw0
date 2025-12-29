@@ -1,8 +1,11 @@
 import React from 'react';
 import { SubjectCard } from './SubjectCard';
 import { SUBJECTS } from '@/lib/constants';
+import { useTestsCount } from '@/hooks/useTestsCount';
 
 export const SubjectsGrid: React.FC = () => {
+  const { counts } = useTestsCount();
+
   return (
     <section className="py-20 bg-muted/30">
       <div className="container px-4">
@@ -20,6 +23,7 @@ export const SubjectsGrid: React.FC = () => {
             <SubjectCard
               key={subject.id}
               {...subject}
+              testsCount={counts[subject.id]}
               delay={index * 50}
             />
           ))}

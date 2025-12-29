@@ -9,7 +9,7 @@ interface SubjectCardProps {
   icon: LucideIcon;
   description: string;
   color: string;
-  testsCount: number;
+  testsCount?: number;
   delay?: number;
 }
 
@@ -50,7 +50,7 @@ export const SubjectCard: React.FC<SubjectCardProps> = ({
       {/* Footer */}
       <div className="flex items-center justify-between mt-auto pt-4 border-t border-border/30">
         <span className="text-sm text-muted-foreground">
-          {testsCount} тестов
+          {testsCount !== undefined ? `${testsCount} тестов` : 'Загрузка...'}
         </span>
         <span className={cn(
           "text-sm font-medium",

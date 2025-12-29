@@ -391,6 +391,8 @@ export type Database = {
         | "physics"
         | "chemistry"
         | "biology"
+        | "english"
+        | "russian"
       user_level: "beginner" | "intermediate" | "advanced" | "expert"
     }
     CompositeTypes: {
@@ -530,6 +532,8 @@ export const Constants = {
         "physics",
         "chemistry",
         "biology",
+        "english",
+        "russian",
       ],
       user_level: ["beginner", "intermediate", "advanced", "expert"],
     },

@@ -3,8 +3,11 @@ import { Helmet } from 'react-helmet-async';
 import { Layout } from '@/components/layout/Layout';
 import { SubjectCard } from '@/components/home/SubjectCard';
 import { SUBJECTS } from '@/lib/constants';
+import { useTestsCount } from '@/hooks/useTestsCount';
 
 const Subjects: React.FC = () => {
+  const { counts } = useTestsCount();
+
   return (
     <>
       <Helmet>
@@ -30,6 +33,7 @@ const Subjects: React.FC = () => {
               <SubjectCard
                 key={subject.id}
                 {...subject}
+                testsCount={counts[subject.id]}
                 delay={index * 50}
               />
             ))}
