@@ -1,4 +1,4 @@
-import { Code, FileCode, Palette, Braces, Calculator, Atom, FlaskConical, Leaf } from "lucide-react";
+import { Code, FileCode, Palette, Braces, Calculator, Atom, FlaskConical, Leaf, Languages, BookOpen } from "lucide-react";
 
 export const SUBJECTS = [
   {
@@ -7,7 +7,6 @@ export const SUBJECTS = [
     icon: Code,
     description: 'Основы программирования, структуры данных, алгоритмы',
     color: 'python',
-    testsCount: 12,
   },
   {
     id: 'html',
@@ -15,7 +14,6 @@ export const SUBJECTS = [
     icon: FileCode,
     description: 'Разметка веб-страниц, семантика, формы',
     color: 'html',
-    testsCount: 8,
   },
   {
     id: 'css',
@@ -23,7 +21,6 @@ export const SUBJECTS = [
     icon: Palette,
     description: 'Стилизация, Flexbox, Grid, анимации',
     color: 'css',
-    testsCount: 10,
   },
   {
     id: 'javascript',
@@ -31,7 +28,6 @@ export const SUBJECTS = [
     icon: Braces,
     description: 'Переменные, функции, DOM, асинхронность',
     color: 'javascript',
-    testsCount: 15,
   },
   {
     id: 'math',
@@ -39,7 +35,6 @@ export const SUBJECTS = [
     icon: Calculator,
     description: 'Алгебра, геометрия, тригонометрия, анализ',
     color: 'math',
-    testsCount: 20,
   },
   {
     id: 'physics',
@@ -47,7 +42,6 @@ export const SUBJECTS = [
     icon: Atom,
     description: 'Механика, электричество, оптика, термодинамика',
     color: 'physics',
-    testsCount: 18,
   },
   {
     id: 'chemistry',
@@ -55,7 +49,6 @@ export const SUBJECTS = [
     icon: FlaskConical,
     description: 'Неорганическая, органическая химия, реакции',
     color: 'chemistry',
-    testsCount: 14,
   },
   {
     id: 'biology',
@@ -63,7 +56,20 @@ export const SUBJECTS = [
     icon: Leaf,
     description: 'Клетка, генетика, эволюция, экология',
     color: 'biology',
-    testsCount: 16,
+  },
+  {
+    id: 'english',
+    name: 'Английский',
+    icon: Languages,
+    description: 'Грамматика, лексика, чтение, письмо',
+    color: 'english',
+  },
+  {
+    id: 'russian',
+    name: 'Русский язык',
+    icon: BookOpen,
+    description: 'Орфография, пунктуация, стилистика, литература',
+    color: 'russian',
   },
 ] as const;
 
