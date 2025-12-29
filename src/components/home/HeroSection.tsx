@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles, Zap, Trophy } from 'lucide-react';
+import { useStats } from '@/hooks/useStats';
 
 export const HeroSection: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { testsCount, subjectsCount } = useStats();
 
   return (
     <section className="relative overflow-hidden py-20 md:py-32">
@@ -62,14 +64,14 @@ export const HeroSection: React.FC = () => {
             <div className="flex flex-col items-center">
               <div className="flex items-center gap-2 text-3xl md:text-4xl font-bold text-primary">
                 <Zap className="h-6 w-6" />
-                <span>100+</span>
+                <span>{testsCount || '0'}</span>
               </div>
               <span className="text-sm text-muted-foreground mt-1">Тестов</span>
             </div>
             <div className="flex flex-col items-center">
               <div className="flex items-center gap-2 text-3xl md:text-4xl font-bold text-accent">
                 <Trophy className="h-6 w-6" />
-                <span>8</span>
+                <span>{subjectsCount}</span>
               </div>
               <span className="text-sm text-muted-foreground mt-1">Предметов</span>
             </div>
