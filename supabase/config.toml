@@ -2,3 +2,6 @@ project_id = "igqsdrkhlddyhmepregy"
 
 [functions.explain-errors]
 verify_jwt = false
+
+[functions.generate-daily-challenge]
+verify_jwt = false
